@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "CrossCutting": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DB_CONNECTION": "Server=localhost;Port=3306;Database=dbAPI;Uid=api;Pwd=Jkr3423*rs",
+        "DATABASE": "MYSQL"
+      }
+    }
+  }
+}
