@@ -1,4 +1,5 @@
 ﻿using Data.Mapping;
+using Data.Seeds;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,16 +16,21 @@ namespace Data.Context
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<UserEntity>(new UserMap().Configure);
+            modelBuilder.Entity<UfEntity>(new UfMap().Configure);
+            modelBuilder.Entity<MunicipioEntity>(new MunicipioMap().Configure);
+            modelBuilder.Entity<CepEntity>(new CepMap().Configure);
 
             modelBuilder.Entity<UserEntity>().HasData(
                 new UserEntity
                 {
                     Id = System.Guid.NewGuid(),
                     Name = "Administrador",
-                    Email = "ronaldo@gmail.com",
+                    Email = "juarez@gmail.com",
                     CreateAt = DateTime.Now,
                 }
             );
+
+            UfSeeds.Ufs(modelBuilder);
         }
     }
 }
