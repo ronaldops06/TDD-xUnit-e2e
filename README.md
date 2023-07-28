@@ -17,7 +17,7 @@ A ideia do TDD é que o processo de desenvolvimento ocorra em ciclos. Estes cicl
 3. Quando o código estiver implementado e o teste satisfeito, refatore o código implementando conceitos de *Clean Code*, por exemplo. Logo após, execute o teste novamente. A nova versão do código também deverá passar sem que seja necessário modificar o teste escrito inicialmente.
 
 
-<img src="https://github.com/ronaldops06/TDD-xUnit-e2e/blob/main/.github/tdd_ciclo.png" />
+<img align="center" src="https://github.com/ronaldops06/TDD-xUnit-e2e/blob/main/.github/tdd_ciclo.png" />
 
 ### DDD
 
@@ -37,7 +37,7 @@ Geralmente, subdomínios e bounded contexts acabam por se tornar serviços e mic
 
 #### Arquitetura Implementada com Base no DDD
 
-<img src="https://github.com/ronaldops06/TDD-xUnit-e2e/blob/main/.github/ddd_organograma.png" />
+<img align="center" src="https://github.com/ronaldops06/TDD-xUnit-e2e/blob/main/.github/ddd_organograma.png" />
 
 1. Application:
 	
