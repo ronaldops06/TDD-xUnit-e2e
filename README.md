@@ -116,3 +116,228 @@ Executar o Build da Solution
 > dotnet new classlib -n Service -o Api.Service -f netcoreapp3.1
 
 > dotnet sln add Api.Service
+
+### Desenvolvimento
+
+<details>
+<summary>Estrutura</summary>
+<pre>
+└───src
+    │   Api.sln
+<details><summary>Application</summary>
+    ├───Api.Application
+    │   │   application.csproj
+    │   │   appsettings.Development.json
+    │   │   appsettings.json
+    │   │   Program.cs
+    │   │   Startup.cs
+    │   │
+    │   ├───Controllers
+    │   │       LoginController.cs -> ControllerBase
+    │   │       UsersController.cs -> ControllerBase
+    │   │
+    │   └───Properties
+    │           launchSettings.json
+</details>
+<details><summary>ApplicationTest</summary>
+    ├───Api.Application.Test
+    │   │   Api.Application.Test.csproj
+    │   │
+    │   └───User
+    │       ├───WhenRequestCreate
+    │       │       ReturnBadRequest.cs
+    │       │       ReturnCreated.cs
+    │       │
+    │       ├───WhenRequestDelete
+    │       │       ReturnBadRequest.cs
+    │       │       ReturnDeleted.cs
+    │       │
+    │       ├───WhenRequestGet
+    │       │       ReturnBadRequest.cs
+    │       │       ReturnGet.cs
+    │       │
+    │       ├───WhenRequestGetAll
+    │       │       ReturnBadRequest.cs
+    │       │       ReturnGetAll.cs
+    │       │
+    │       └───WhenRequestUpdate
+    │               ReturnBadRequest.cs
+    │               ReturnUpdated.cs
+</details>
+<details><summary>CrossCutting</summary>
+    ├───Api.CrossCutting
+    │   │   CrossCutting.csproj
+    │   │
+    │   ├───DependencyInjection
+    │   │       ConfigureRepository.cs
+    │   │       ConfigureService.cs
+    │   │
+    │   ├───Mappings
+    │   │       DtoToModelProfile.cs	-> Profile
+    │   │       EntityToDtoProfile.cs	-> Profile
+    │   │       ModelToEntityProfile.cs	-> Profile
+    │   │
+    │   │
+    │   └───Properties
+    │           launchSettings.json
+</details>
+<details><summary>Data</summary>
+    ├───Api.Data
+    │   │   Data.csproj
+    │   │   global.json
+    │   │
+    │   ├───Context
+    │   │       ContextFactory.cs	-> IDesignTimeDbContextFactory<MyContext>
+    │   │       MyContext.cs	-> DbContext
+    │   │
+    │   ├───Implementations
+    │   │       UserImplementation.cs	-> BaseRepository<Domain.Entities.UserEntity>, Domain.Repository.IUserRepository
+    │   │
+    │   ├───Mapping
+    │   │       UserMap.cs	-> IEntityTypeConfiguration<Domain.Entities.UserEntity>
+    │   │
+    │   ├───Repository
+    │   │       BaseRepository.cs	-> Domain.Interfaces.IRepository<T> where T : Domain.Entities.BaseEntity
+    │   │
+    │   └───Seeds
+    │           UfSeeds.cs
+</details>
+<details><summary>DataTest</summary>
+    ├───Api.Data.Test
+    │   │   Api.Data.Test.csproj
+    │   │   BaseTest.cs
+    │   │   UserCrudComplete.cs
+    │   │
+</details>
+<details><summary>Domain</summary>
+    ├───Api.Domain
+    │   │   Domain.csproj
+    │   │
+    │   ├───Dtos
+    │   │   │   LoginDto.cs
+    │   │   │
+    │   │   └───User
+    │   │           UserDto.cs
+    │   │           UserDtoResult.cs
+    │   │
+    │   ├───Entities
+    │   │       BaseEntity.cs
+    │   │       UserEntity.cs	-> BaseEntity
+    │   │
+    │   ├───Interfaces
+    │   │   │   IRepository.cs
+    │   │   │
+    │   │   └───Services
+    │   │       │
+    │   │       └───User
+    │   │               ILoginService.cs
+    │   │               IUserService.cs
+    │   │
+    │   ├───Models
+    │   │       BaseModel.cs
+    │   │       UserModel.cs	-> BaseModel
+    │   │
+    │   ├───Repository
+    │   │       IUserRepository.cs	-> IRepository<UserEntity>
+    │   │
+    │   └───Security
+    │           SigningConfiguration.cs
+</details>
+<details><summary>IntegrationTest</summary>
+    ├───Api.Integration.Test
+    │   │   Api.Integration.Test.csproj
+    │   │   BaseIntegration.cs
+    │   │   LoginResponseDto.cs
+    │   │
+    │   └───User
+    │           WhenRequestUser.cs
+</details>
+<details><summary>Service</summary>
+    ├───Api.Service
+    │   │   Service.csproj
+    │   │
+    │   └───Services
+    │           LoginService.cs	-> Domain.Interfaces.Services.User.ILoginService
+    │           UserService.cs	-> Domain.Interfaces.Services.User.IUserService
+</details>
+<details><summary>ServiceTest</summary>
+    └───Api.Service.Test
+        │   Api.Service.Test.csproj
+        │   BaseTestService.cs
+        │
+        ├───AutoMapper
+        │       UserMapper.cs
+        │
+        ├───Login
+        │       WhenExecuteFindByLogin.cs
+        │
+        └───User
+                UserTest.cs
+                WhenExecuteCreate.cs
+                WhenExecuteDelete.cs
+                WhenExecuteGet.cs
+                WhenExecuteGetAll.cs
+                WhenExecuteUpdate.cs
+</details>
+<pre>
+</details>
+
+<details>
+<summary>Referências Entre Projetos</summary>
+
+|**Projeto**|**Projeto Teste**|
+|:-|:-|
+|**Api.Application** |**Api.Application.Test** |
+|└─ Api.Domain |└─ Api.Domain|
+|└─ Api.Service |└─ Api.Service|
+|└─ Api.CrossCutting|└─ Api.Application|
+|||
+|**Api.Service**|**Api.Service.Test**|
+|└─ Api.Domain|└─ Api.Domain|
+|└─ Api.Data|└─ Api.CrossCutting|
+||└─ Api.Service|
+|||
+|**Api.Data**|**Api.Data.Test**|
+|└─ Api.Domain|└─ Api.Domain|
+||└─ Api.CrossCutting|
+||└─ Api.Data|
+|||
+|**Api.CrossCutting**|
+|└─ Api.Domain|
+|└─ Api.Service|
+|└─ Api.Data|
+|||
+|**Api.Domain**||
+|Sem referências|
+|||
+||**Api.Integration.Test**|
+||└─ Api.Application|
+||└─ Api.Domain|
+||└─ Api.Data|
+||└─ Api.CrossCutting|
+
+</details>
+
+<details>
+<summary>Pacotes Nuget Instalados</summary>
+
+||Application|Domain|Service|CrossCutting|Data|Application.Test|Service.Test|Data.Test|Integration.Test|
+|:-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|Swashbuckle.AspNetCore|x|-|-|-|-|-|-|-|-|
+|Microsoft.AspNetCore.Authentication.JwtBearer|x|-|-|-|-|-|-|-|-|
+|System.IdentityModel.Tokens.Jwt|-|x|-|-|-|-|-|-|-|
+|Pomelo.EntityFrameworkCore.MySql|-|x|-|x|x|-|-|-|-|
+|Microsoft.EntityFrameworkCore.Design|x|x|-|x|x|-|-|x|x|
+|Microsoft.EntityFrameworkCore.Tools|x|x|-|x|x|-|-|x|x|
+|AutoMapper|-|-|x|x|-|-|x|-|x|
+|AutoMapper.Extensions.Microsoft.DependencyInjection|-|-|-|x|-|-|x|x|x|
+|Microsoft.NET.Test.Sdk|-|-|-|-|-|x|x|x|x|
+|xunit|-|-|-|-|-|x|x|x|x|
+|xunit.runner.visualstudio|-|-|-|-|-|x|x|x|x|
+|coverlet.collector|-|-|-|-|-|x|x|x|x|
+|Faker.NETCore|-|-|-|-|-|x|x|x|x|99
+|Moq|-|-|-|-|-|x|x|-|-|
+|Newtonsoft.Json|-|-|-|-|-|-|-|-|x|
+|Microsoft.AspNetCore.TestHost|-|-|-|-|-|-|-|-|x|
+
+</details>
