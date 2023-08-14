@@ -66,12 +66,16 @@ Criar uma nova Solution
 > dotnet new sln --name <Nome Solution>
 
 Criar um novo Projeto
-* Executar na pasta onde se encontra a solution
+* Executar na pasta onde se encontra a solution (src)
 > dotnet new <Tipo Projeto> -n <Nome Projeto> -o <Local (namespace) na Solution onde será criado> [-f <versão framework>]
 
 Adicionar o Projeto a Solution
-* Executar na pasta onde se encontra a solution e o projeto
+* Executar na pasta onde se encontra a solution e o projeto (src)
 > dotnet sln add <Nome do Projeto>
+
+Adicionar Referências entre Projetos
+* Executar na pasta onde se encontra a solution e o projeto (src)
+> dotnet add <Projeto que Conterá a Referência> reference <Projeto Referenciado>
 
 Executar a restauração dos arquivos da aplicação
 > dotnet restore
@@ -80,42 +84,94 @@ Executar o Build da Solution
 * Executar na pasta onde se encontra a solution
 > dotnet build
 
+<a id="install-ef"></a>
+Instalar o Entity Framework .NET Command-line Tools
+> dotnet toll install --global dotnet-ef
+
+Gerar a Migração para o Banco de Dados
+> dotnet ef migrations add <Nome Migration>
+
+Executar a Migração no Bando de Dados
+> dotnet ef database update
+
+Executar os Testes Unitários
+> dotnet test
+
 ### Criação da Arquitetura do Projeto
 1. Criar a Solution Api
 
 > dotnet new sln --name Api
 
-2. Criar o Projeto Application (WebApi) e Adicionar a Solution Api
+2. Criar o Projeto Domain (ClassLibrary) e Adicionar a Solution Api
 
-> dotnet new webapi -n Application -o Api.Application
->
-> dotnet sln add Api.Application
-
-* Remover todas as classes relacionadas a WeatherForecast, criadas automaticamente.
-
-3. Criar o Projeto Domain (ClassLibrary) e Adicionar a Solution Api
-
-> dotnet new classlib -n Domain -o Api.Domain -f netcoreapp3.1
-
+> dotnet new classlib -n Domain -o Api.Domain -f netcoreapp3.1\
 > dotnet sln add Api.Domain
+
+3. Criar o Projeto Data (ClassLibrary) e Adicionar a Solution Api
+
+> dotnet new classlib -n Data -o Api.Data -f netcoreapp3.1\
+> dotnet sln add Api.Data\
+> dotnet add .\Api.Data\ reference .\Api.Domain\
+
+* Após instalar os [pacotes Nuget](#pacotes-nuget) desse projeto, na pasta dele, deve-se rodar o [comando](#install-ef) para instalar o EF.
 
 4. Criar o Projeto CrossCutting (ClassLibrary) e Adicionar a Solution Api
 
-> dotnet new classlib -n CrossCutting -o Api.CrossCutting -f netcoreapp3.1
+> dotnet new classlib -n CrossCutting -o Api.CrossCutting -f netcoreapp3.1\
+> dotnet sln add Api.CrossCutting\
+> dotnet add .\Api.CrossCutting\ reference .\Api.Data\\\
+> dotnet add .\Api.CrossCutting\ reference .\Api.Domain\\\
+> dotnet add .\Api.CrossCutting\ reference .\Api.Service\
 
-> dotnet sln add Api.CrossCutting
+5. Criar o Projeto Service (ClassLibrary) e Adicionar a Solution Api
 
-5. Criar o Projeto Data (ClassLibrary) e Adicionar a Solution Api
+> dotnet new classlib -n Service -o Api.Service -f netcoreapp3.1\
+> dotnet sln add Api.Service\
+> dotnet add .\Api.Service\ reference .\Api.Domain\\\
+> dotnet add .\Api.Service\ reference .\Api.Data\
 
-> dotnet new classlib -n Data -o Api.Data -f netcoreapp3.1
+6. Criar o Projeto Application (WebApi) e Adicionar a Solution Api
 
-> dotnet sln add Api.Data
+> dotnet new webapi -n Application -o Api.Application\
+> dotnet sln add Api.Application\
+> dotnet add .\Api.Application\ reference .\Api.Domain\\\
+> dotnet add .\Api.Application\ reference .\Api.Service\\\
+> dotnet add .\Api.Application\ reference .\Api.CrossCutting\
 
-6. Criar o Projeto Service (ClassLibrary) e Adicionar a Solution Api
+* Remover todas as classes relacionadas a WeatherForecast, criadas automaticamente.
 
-> dotnet new classlib -n Service -o Api.Service -f netcoreapp3.1
+7. Criar o Projeto Data.Test (XUnit) e Adicionar a Solution Api
 
-> dotnet sln add Api.Service
+> dotnet new xunit -n Api.Data.Test -o Api.Data.Test\
+> dotnet sln add Api.Data.Test\
+> dotnet add .\Api.Data.Test\ reference .\Api.Data\\\
+> dotnet add .\Api.Data.Test\ reference .\Api.Domain\\\
+> dotnet add .\Api.Data.Test\ reference .\Api.CrossCutting\
+
+8. Criar o Projeto Api.Service.Test (XUnit) e Adicionar a Solution Api
+
+> dotnet new xunit -n Api.Service.Test -o Api.Service.Test\
+> dotnet sln add Api.Service.Test\
+> dotnet add .\Api.Service.Test\ reference .\Api.Domain\\\
+> dotnet add .\Api.Service.Test\ reference .\Api.CrossCutting\\\
+> dotnet add .\Api.Service.Test\ reference .\Api.Service\
+
+9. Criar o Projeto Api.Application.Test (XUnit) e Adicionar a Solution Api
+
+> dotnet new xunit -n Api.Application.Test -o Api.Application.Test\
+> dotnet sln add Api.Application.Test\
+> dotnet add .\Api.Application.Test\ reference .\Api.Domain\\\
+> dotnet add .\Api.Application.Test\ reference .\Api.Service\\\
+> dotnet add .\Api.Application.Test\ reference .\Api.Application\
+
+10. Criar o Projeto Api.Integration.Test (XUnit) e Adicionar a Solution Api
+
+> dotnet new xunit -n Api.Integration.Test -o Api.Integration.Test\
+> dotnet sln add Api.Integration.Test\
+> dotnet add .\Api.Integration.Test\ reference .\Api.Domain\\\
+> dotnet add .\Api.Integration.Test\ reference .\Api.Data\\\
+> dotnet add .\Api.Integration.Test\ reference .\Api.CrossCutting\\\
+> dotnet add .\Api.Integration.Test\ reference .\Api.Application\
 
 ### Desenvolvimento
 
@@ -318,6 +374,7 @@ Executar o Build da Solution
 
 </details>
 
+<a id="pacotes-nuget"></a>
 <details>
 <summary>Pacotes Nuget Instalados</summary>
 
@@ -341,3 +398,22 @@ Executar o Build da Solution
 |Microsoft.AspNetCore.TestHost|-|-|-|-|-|-|-|-|x|
 
 </details>
+
+### Consideração Sobre Classes Específicas
+Data
+-> Context
+ContextFactory -> É realizado a configuração da conexão com o banco de dados.
+-> Mapping
+UserMap -> Deve ser configurado o mapeamento da tabela, comas as devidas restrições para cada campo.
+
+Domain
+-> Interfaces
+IRepository -> Contem as assinaturas dos metodos que deverão ser implementados para as operações com o banco de dados
+
+### Atributos XUnit
+|Atributo|Descrição|
+|--|--|
+|[Fact]|Habilita o método para ser executado pelo processo de testes.|
+|[Theory] e [InlineData]|Representa um pacote de testes que executa o mesmo método, mas têm diferentes argumentos de entrada. O atributo [InlineData] especifica valores para essas entradas.|
+|[Trait]|Especifica uma categoria para cada método, assim é possível diferenciá-los e agrupá-los|
+|Assert|Executa o teste efetivamente.|
